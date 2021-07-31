@@ -7,32 +7,34 @@ import * as am4core from '@amcharts/amcharts4/core';
 // @ts-ignore
 import * as am4charts from '@amcharts/amcharts4/charts';
 // @ts-ignore
-import * as am4plugins from "@amcharts/amcharts4/plugins/sunburst"; 
+import * as am4plugins from '@amcharts/amcharts4/plugins/sunburst';
 import { ApiService } from '../api.service';
 import { IDropdownSettings } from 'ng-multiselect-dropdown';
 @Component({
   selector: 'app-dashboard',
   templateUrl: './dashboard.component.html',
-  styleUrls: ['./dashboard.component.scss']
+  styleUrls: ['./dashboard.component.scss'],
 })
-export class DashboardComponent  {
-
+export class DashboardComponent {
   private chart: am4charts.XYChart;
- 
-  list : any[];
-  query="India,Nepal,Bangladesh,Pakistan,Bhutan,Sri Lanka,Maldives";
-  singleRecord:boolean;
-  constructor(@Inject(PLATFORM_ID) private platformId:any, private zone: NgZone,private apiService: ApiService) {
-    this.list = 
-    [
-      {name :'Bangladesh',checked : false},
-      {name :'Bhutan',checked : false},
-      {name :'India',checked : false},
-       {name :'Maldives',checked : false},  
-       {name :'Nepal',checked : false},
-       {name :'Pakistan',checked : false},
-      {name :'Sri Lanka',checked : false}
-    ]
+
+  list: any[];
+  query = 'India,Nepal,Bangladesh,Pakistan,Bhutan,Sri Lanka,Maldives';
+  singleRecord: boolean;
+  constructor(
+    @Inject(PLATFORM_ID) private platformId: any,
+    private zone: NgZone,
+    private apiService: ApiService
+  ) {
+    this.list = [
+      { name: 'Bangladesh', checked: true },
+      { name: 'Bhutan', checked: true },
+      { name: 'India', checked: true },
+      { name: 'Maldives', checked: true },
+      { name: 'Nepal', checked: true },
+      { name: 'Pakistan', checked: true },
+      { name: 'Sri Lanka', checked: true },
+    ];
   }
 
   // Run the function only in the browser
@@ -45,7 +47,7 @@ export class DashboardComponent  {
   }
 
   ngAfterViewInit() {
- // this.loadData();  
+    this.loadData();
   }
 
   ngOnDestroy() {
@@ -56,67 +58,66 @@ export class DashboardComponent  {
       }
     });
   }
-  loadData(){
-// Chart code goes in here
-this.browserOnly(() => {
-  // Create the chart
-  let chart = am4core.create("chartdiv", am4plugins.Sunburst);
-let data:any = [];     
-this.apiService.getData(this.query).subscribe((res)=>{
-  console.log(res);
-  let dt:any = {};
-  console.log(this.singleRecord);
-if(this.singleRecord){
-  dt = {
-    name: res.country,
-    children: [
-      { name: "cases", value: res.cases },
-      { name: "recovered", value: res.recovered },
-      { name: "death", value: res.death },
-      { name: "active", value: res.active }
-    ]
-    }
-    data.push(dt);
-}else{
-res.forEach(element => {
-dt = {
-name: element.country,
-children: [
-  { name: "cases", value: element.cases },
-  { name: "recovered", value: element.recovered },
-  { name: "death", value: element.death },
-  { name: "active", value: element.active }
-]
-}
-data.push(dt);
-});}
+  loadData() {
+    // Chart code goes in here
+    this.browserOnly(() => {
+      // Create the chart
+      let chart = am4core.create('chartdiv', am4plugins.Sunburst);
+      let data: any = [];
+      this.apiService.getData(this.query).subscribe((res) => {
+        console.log(res);
+        let dt: any = {};
+        console.log(this.singleRecord);
+        if (this.singleRecord) {
+          dt = {
+            name: res.country,
+            children: [
+              { name: 'cases', value: res.cases },
+              { name: 'recovered', value: res.recovered },
+              { name: 'death', value: res.death },
+              { name: 'active', value: res.active },
+            ],
+          };
+          data.push(dt);
+        } else {
+          res.forEach((element) => {
+            dt = {
+              name: element.country,
+              children: [
+                { name: 'cases', value: element.cases },
+                { name: 'recovered', value: element.recovered },
+                { name: 'death', value: element.death },
+                { name: 'active', value: element.active },
+              ],
+            };
+            data.push(dt);
+          });
+        }
 
-setTimeout(()=>{
-chart.data =data;
-// Define data fields
-chart.dataFields.value = "value";
-chart.dataFields.name = "name";
-chart.dataFields.children = "children";
-
-},500);
-}); 
-});
-
+        setTimeout(() => {
+          chart.data = data;
+          // Define data fields
+          chart.dataFields.value = 'value';
+          chart.dataFields.name = 'name';
+          chart.dataFields.children = 'children';
+        }, 500);
+      });
+    });
   }
-  shareCheckedList(items:any[]){
+  shareCheckedList(items: any[]) {
     console.log(items);
-this.query = items.join(',');
-if(items.length==1){
-  this.singleRecord = true;
-}else {
-  this.singleRecord = false;
-}
-if(this.query.length>3){
-this.loadData();
-  }}
-  shareIndividualCheckedList(item:{}){
-    console.log(item);
-    this.query = "";
+    this.query = items.join(',');
+    if (items.length == 1) {
+      this.singleRecord = true;
+    } else {
+      this.singleRecord = false;
+    }
+    if (this.query.length > 3) {
+      this.loadData();
+    }
   }
-
+  shareIndividualCheckedList(item: {}) {
+    console.log(item);
+    this.query = '';
+  }
 }
